@@ -268,7 +268,159 @@
 #     --select COUNT \
 
 # 4 - Parallel SCAN
+# aws dynamodb scan \
+#   --table-name UserOrdersTable \
+#   --total-segments 3 \
+#   --segment 1 \
+
+# DELETE table before re-create and add LSI
+# aws dynamodb delete-table \
+#     --table-name UserOrdersTable \
+
+# 5 - ADD LSI
+# aws dynamodb create-table \
+#   --table-name UserOrdersTable \
+#   --attribute-definitions '[
+#     {
+#         "AttributeName": "Username",
+#         "AttributeType": "S"
+#     },
+#     {
+#         "AttributeName": "OrderId",
+#         "AttributeType": "S"
+#     },
+#     {
+#         "AttributeName": "Amount",
+#         "AttributeType": "N"
+#     }
+#   ]' \
+#   --key-schema '[
+#     {
+#         "AttributeName": "Username",
+#         "KeyType": "HASH"
+#     },
+#     {
+#         "AttributeName": "OrderId",
+#         "KeyType": "RANGE"
+#     }
+#   ]' \
+#   --local-secondary-indexes '[
+#     {
+#         "IndexName": "UserAmountIndex",
+#         "KeySchema": [
+#             {
+#                 "AttributeName": "Username",
+#                 "KeyType": "HASH"
+#             },
+#             {
+#                 "AttributeName": "Amount",
+#                 "KeyType": "RANGE"
+#             }
+#         ],
+#         "Projection": {
+#             "ProjectionType": "KEYS_ONLY"
+#         }
+#     }
+#   ]' \
+#   --provisioned-throughput '{
+#     "ReadCapacityUnits": 1,
+#     "WriteCapacityUnits": 1
+#   }' \
+
+# 6 - QUERY by LSI
+# aws dynamodb query \
+#   --table-name UserOrdersTable \
+#   --index-name UserAmountIndex \
+#   --key-condition-expression "Username = :username AND Amount > :amount" \
+#   --expression-attribute-values '{
+#       ":username": { "S": "daffyduck" },
+#       ":amount": { "N": "100" }
+#   }' \
+
+#7 - ADD GSI
+# aws dynamodb update-table \
+#     --table-name UserOrdersTable \
+#     --attribute-definitions '[
+#       {
+#           "AttributeName": "ReturnDate",
+#           "AttributeType": "S"
+#       },
+#       {
+#           "AttributeName": "OrderId",
+#           "AttributeType": "S"
+#       }
+#     ]' \
+#     --global-secondary-index-updates '[
+#         {
+#             "Create": {
+#                 "IndexName": "ReturnDateOrderIdIndex",
+#                 "KeySchema": [
+#                     {
+#                         "AttributeName": "ReturnDate",
+#                         "KeyType": "HASH"
+#                     },
+#                     {
+#                         "AttributeName": "OrderId",
+#                         "KeyType": "RANGE"
+#                     }
+#                 ],
+#                 "Projection": {
+#                     "ProjectionType": "ALL"
+#                 },
+#                 "ProvisionedThroughput": {
+#                     "ReadCapacityUnits": 1,
+#                     "WriteCapacityUnits": 1
+#                 }
+#             }
+#         }
+#     ]' \
+
+# aws dynamodb batch-write-item \
+#   --request-items '{
+#       "UserOrdersTable": [
+#           {
+#               "PutRequest": {
+#                   "Item": {
+#                       "Username": {"S": "alexdebrie"},
+#                       "OrderId": {"S": "20160630-12928"},
+#                       "Amount": {"N": "142.23"},
+#                       "ReturnDate": {"S": "20160705"}
+#                   }
+#               }
+#           },
+#           {
+#               "PutRequest": {
+#                   "Item": {
+#                       "Username": {"S": "daffyduck"},
+#                       "OrderId": {"S": "20170608-10171"},
+#                       "Amount": {"N": "18.95"},
+#                       "ReturnDate": {"S": "20170628"}
+#                   }
+#               }
+#           },
+#           {
+#               "PutRequest": {
+#                   "Item": {
+#                       "Username": {"S": "daffyduck"},
+#                       "OrderId": {"S": "20170609-25875"},
+#                       "Amount": {"N": "116.86"},
+#                       "ReturnDate": {"S": "20170628"}
+#                   }
+#               }
+#           },
+#           {
+#               "PutRequest": {
+#                   "Item": {
+#                       "Username": {"S": "yosemitesam"},
+#                       "OrderId": {"S": "20170609-18618"},
+#                       "Amount": {"N": "122.45"},
+#                       "ReturnDate": {"S": "20170615"}
+#                   }
+#               }
+#           }
+#       ]
+#   }' \
+# 8 - Query GSI
 aws dynamodb scan \
     --table-name UserOrdersTable \
-    --total-segments 3 \
-    --segment 1 \
+    --index-name ReturnDateOrderIdIndex \

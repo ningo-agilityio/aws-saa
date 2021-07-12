@@ -50,18 +50,18 @@
 #     }' \
 
 # 6 - UPDATE item
-aws dynamodb update-item \
-  --table-name UsersTable \
-  --key '{
-    "Username": {"S": "daffyduck"}
-  }' \
-  --update-expression 'SET #dob = :dob' \
-  --expression-attribute-names '{
-    "#dob": "DateOfBirth"
-  }' \
-  --expression-attribute-values '{
-    ":dob": {"S": "1937-04-17"}
-  }' \
+# aws dynamodb update-item \
+#   --table-name UsersTable \
+#   --key '{
+#     "Username": {"S": "daffyduck"}
+#   }' \
+#   --update-expression 'SET #dob = :dob' \
+#   --expression-attribute-names '{
+#     "#dob": "DateOfBirth"
+#   }' \
+#   --expression-attribute-values '{
+#     ":dob": {"S": "1937-04-17"}
+#   }' \
 
 # 7 - DELETE item
 # aws dynamodb delete-item \
