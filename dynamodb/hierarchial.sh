@@ -54,48 +54,54 @@
 #       }
 #     }
 #   ]' \
-aws dynamodb batch-write-item \
-  --request-items '{
-    "StarBuck": [
-      {
-        "PutRequest": {
-          "Item": {
-            "StoreNumber": {"S": "S001"},
-            "Country": {"S": "VN"},
-            "StateCityPostcode": {"S": "55000"}
-          }
-        }
-      },
-      {
-        "PutRequest": {
-          "Item": {
-            "StoreNumber": {"S": "S098"},
-            "Country": {"S": "US"},
-            "StateCityPostcode": {"S": "03567"}
-          }
-        }
-      },
-      {
-        "PutRequest": {
-          "Item": {
-            "StoreNumber": {"S": "S110"},
-            "Country": {"S": "FR"},
-            "StateCityPostcode": {"S": "23456"}
-          }
-        }
-      },
-      {
-        "PutRequest": {
-          "Item": {
-            "StoreNumber": {"S": "S980"},
-            "Country": {"S": "EN"},
-            "StateCityPostcode": {"S": "12503"}
-          }
-        }
-      }
-    ]
-  }' \
+# aws dynamodb batch-write-item \
+#   --request-items '{
+#     "StarBuck": [
+#       {
+#         "PutRequest": {
+#           "Item": {
+#             "StoreNumber": {"S": "S001"},
+#             "Country": {"S": "VN"},
+#             "StateCityPostcode": {"S": "55000"}
+#           }
+#         }
+#       },
+#       {
+#         "PutRequest": {
+#           "Item": {
+#             "StoreNumber": {"S": "S098"},
+#             "Country": {"S": "US"},
+#             "StateCityPostcode": {"S": "03567"}
+#           }
+#         }
+#       },
+#       {
+#         "PutRequest": {
+#           "Item": {
+#             "StoreNumber": {"S": "S110"},
+#             "Country": {"S": "FR"},
+#             "StateCityPostcode": {"S": "23456"}
+#           }
+#         }
+#       },
+#       {
+#         "PutRequest": {
+#           "Item": {
+#             "StoreNumber": {"S": "S980"},
+#             "Country": {"S": "EN"},
+#             "StateCityPostcode": {"S": "12503"}
+#           }
+#         }
+#       }
+#     ]
+#   }' \
 
-aws dynamodb scan \
+aws dynamodb get-item \
     --table-name StarBuck \
-    --index-name StoreLocationIndex \
+    --key '{
+      "StoreNumber": {"S": "S980"}
+    }' \
+
+# aws dynamodb scan \
+#     --table-name StarBuck \
+#     --index-name StoreLocationIndex \
